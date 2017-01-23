@@ -1,0 +1,32 @@
+type R = [8]
+type C = [8]
+type T = [8]
+
+X = join [[0xFC .. 0xFF], [0x00 .. 0x03]]:[_]R
+Y = join [[0xFC .. 0xFF], [0x00 .. 0x03]]:[_]R
+_T = [0 .. 3]:[_]T
+
+circle : R -> R -> R -> R
+circle x y r = x*x + y*y - r*r 
+
+H : R -> [1]
+H z = if (z == 0 \/ z > 127) then 1 else 0
+
+filter : R -> R -> R -> [1] 
+filter x y r = H (circle x y r)
+
+
+color : [1] -> R
+color b = if (b == 1) then 0xFF else 0x00
+
+image : R -> [8][8]C
+image r = [ [ color (filter i j r) | i <- X ] | j <- Y ]
+
+state : R -> T -> R
+state r t = r*t
+
+frame : R -> T -> [8][8]C
+frame r t = image (state r t)
+
+movie : R -> [4][8][8]C
+movie r = [ frame r k | k <- _T ]
