@@ -16,17 +16,14 @@ filter : R -> R -> R -> [1]
 filter x y r = H (circle x y r)
 
 
-color : [1] -> R
-color b = if (b == 1) then 0xFF else 0x00
-
-image : R -> [8][8]C
-image r = [ [ color (filter i j r) | i <- X ] | j <- Y ]
+image : R -> [8][8][1]
+image r = [ [ filter i j r | i <- X ] | j <- Y ]
 
 state : R -> T -> R
 state r t = r*t
 
-frame : R -> T -> [8][8]C
+frame : R -> T -> [8][8][1]
 frame r t = image (state r t)
 
-movie : R -> [4][8][8]C
+movie : R -> [4][8][8][1]
 movie r = [ frame r k | k <- _T ]
