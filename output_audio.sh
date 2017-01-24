@@ -8,7 +8,7 @@ echo "track 0" > run_audio.scr
 state="s"
 cur_sample=""
 
-write_pixel() {
+write_sample() {
     local sample="${cur_sample/0x/\\x}"
     echo -en "$sample" >> audio.pcm
     cur_sample=""
@@ -17,17 +17,10 @@ write_pixel() {
 while read -n1 char; do
     case "$state" in
         s)  if [ "$char" == "[" ]; then
-                state="m" 
+                state="t" 
             fi
             ;;
         t)  case "$char" in
-            [) state="r";
-               ;;
-            ]) state="e";
-               ;;
-            esac
-            ;;
-        r)  case "$char" in
             [) state="a";
                ;;
             ]) state="e";
@@ -38,7 +31,7 @@ while read -n1 char; do
             ,) write_sample
                ;;
             ]) write_sample
-               state="r"
+               state="t"
                ;;
             *) cur_sample+=$char
                ;;
