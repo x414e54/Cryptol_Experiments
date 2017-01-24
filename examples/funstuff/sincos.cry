@@ -1,0 +1,31 @@
+type R = [16]
+type T = [16]
+type F = [32]
+
+_T = [0 .. 44099]:[_]T
+
+t7 = 1 //1/7!
+t5 = 1 //1/5!
+t3 = 1 //1/3!
+
+tof : R -> F
+tof a = 1:F
+
+fromf : F -> R
+fromf a = 1:R
+
+// Extremely approximate sin
+sin : F -> F
+sin x = x - ((x * x * x) * t3) + ((x * x * x * x * x) * t5) - ((x * x * x * x * x * x * x) * t7)
+
+//y(t)=Asin(2pft+o)
+
+channel : T -> R
+channel t = fromf(sin(tof(t)))
+
+sample : T -> [2]R
+sample t = [ channel t , channel (t + 11025) ]
+
+// intput to main = array of music notes? for left and right based on selecting via time
+track : R -> [44100][2]R
+track f = [ sample ((f * 44099) + k) | k <- _T ]
