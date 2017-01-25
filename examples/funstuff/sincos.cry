@@ -21,7 +21,7 @@ fract : F -> R
 fract a = (split a : [2]R) @ 1
 
 tod : F -> D
-tod a = join [0:R, trunc(a), fract(a), 0:R]
+tod a = join [0:F, a]
 
 truncd : D -> F
 truncd a = (split a : [2]F) @ 0
