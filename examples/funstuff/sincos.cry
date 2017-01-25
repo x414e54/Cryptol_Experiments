@@ -58,9 +58,10 @@ sin x = x - mdf(x, [2..3]) + mdf(x, [2..5]) - mdf(x, [2..7])
 channel : T -> R
 channel t = round(sin(mul(tof(t % 22050), pi_sa)) * tof(0x7FFF))
 
-sample : T -> [2]R
-sample t = [ channel t , channel (t + 5512) ]
+sample : T -> [2][8]
+//sample t = join [ split (channel t) : [2][8], split (channel (t + 5512)) : [2][8] ]
+sample t = split (channel t) : [2][8]
 
 // intput to main = array of music notes? for left and right based on selecting via time
-track : R -> [22050][2]R
+track : R -> [22050][2][8]
 track f = [ sample ((f * 22049) + k) | k <- _T ]
