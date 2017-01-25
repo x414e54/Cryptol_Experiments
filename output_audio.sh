@@ -40,4 +40,4 @@ while read -n1 char; do
     esac
 done < temp
 
-ffmpeg -f s16le -ar 22.05k -ac 2 -i audio.pcm audio.wav
+ffmpeg -f s16be -ar 22.05k -ac 2 -i audio.pcm audio.wav
