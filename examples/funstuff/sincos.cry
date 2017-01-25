@@ -10,7 +10,7 @@ tof : R -> F
 tof a = join [a, 0:R] // * pi_sa // a * pi_sa
 
 fromf : F -> R
-fromf a = (split (a >> 16) : [2]R) @ 0
+fromf a = (split (a >> 16) : [2]R) ! 0
 
 mul : (F, F) -> F
 mul (a, b) = (a * b) >> 16 // Todo rounding
