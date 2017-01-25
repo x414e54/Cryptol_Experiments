@@ -7,16 +7,16 @@ _T = [0 .. 44099]:[_]T
 pi_sa = 0:F             //0.000071237928653
 
 tof : R -> F
-tof a = pi_sa // a * pi_sa
+tof a = join [a, 0:R] // * pi_sa // a * pi_sa
 
 fromf : F -> R
-fromf a = 1:R
+fromf a = (split (a >> 16) : [2]R) @ 0
 
 mul : (F, F) -> F
-mul (a, b) = a * b
+mul (a, b) = (a * b) >> 16 // Todo rounding
 
 div : (F, F) -> F
-div (a, b) = a / b
+div (a, b) = (a << 16) / b
 
 // Improve this
 mdf : {n} (fin n) => (F, [n]F) -> F
