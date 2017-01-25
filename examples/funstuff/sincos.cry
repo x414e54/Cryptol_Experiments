@@ -1,22 +1,33 @@
 type R = [16]
 type T = [16]
-type F = [32]
+type F = [32] // Fixed point
 
 _T = [0 .. 44099]:[_]T
 
-t7 = 1 //1/7!
-t5 = 1 //1/5!
-t3 = 1 //1/3!
+pi_sa = 0:F             //0.000071237928653
 
 tof : R -> F
-tof a = 1:F
+tof a = pi_sa // a * pi_sa
 
 fromf : F -> R
 fromf a = 1:R
 
+mul : (F, F) -> F
+mul (a, b) = a * b
+
+div : (F, F) -> F
+div (a, b) = a / b
+
+// Improve this
+mdf : {n} (fin n) => (F, [n]F) -> F
+mdf (a, b) = ys ! 0
+    where ys = [a] # [ mul(div(a, x), y) | x <- b
+                                         | y <- ys
+                     ]
+
 // Extremely approximate sin
 sin : F -> F
-sin x = x - ((x * x * x) * t3) + ((x * x * x * x * x) * t5) - ((x * x * x * x * x * x * x) * t7)
+sin x = x - mdf(x, [2..3]) + mdf(x, [2..5]) - mdf(x, [2..7])
 
 //y(t)=Asin(2pft+o)
 
