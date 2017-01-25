@@ -56,7 +56,7 @@ sin x = x - mdf(x, [2..3]) + mdf(x, [2..5]) - mdf(x, [2..7])
 //y(t)=Asin(2pft+o)
 
 channel : T -> R
-channel t = round(sin(mul(tof(t % 22050), pi_sa)) * tof(0x7FFF))
+channel t = round(mul(sin(mul(tof(t % 22050), pi_sa)), tof(0x7FFF)))
 
 sample : T -> [2][8]
 //sample t = join [ split (channel t) : [2][8], split (channel (t + 5512)) : [2][8] ]
