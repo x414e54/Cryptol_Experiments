@@ -5,11 +5,12 @@ type D = [64] // Double Fixed point - used for mul and div
 
 _T = [0 .. 44099]:[_]T
 
-pi_sa = 0:F             //0.000071237928653
+// Maybe do (t*PI)/44100 instead
+pi_sa = join [0:R, 4:R] // ~ 0.000071237928653 ~= PI/44100
 
 ///// Improve these fixed point math functions
 tof : R -> F
-tof a = join [a, 0:R] // * pi_sa // a * pi_sa
+tof a = join [a, 0:R]
 
 round : F -> R
 round a = (split a : [2]R) @ 0 // Round here
@@ -22,6 +23,9 @@ fract a = (split a : [2]R) @ 1
 
 tod : F -> D
 tod a = join [0:F, a]
+
+todd : F -> D
+todd a = join [a, 0:F]
 
 truncd : D -> F
 truncd a = (split a : [2]F) @ 0
@@ -36,7 +40,7 @@ mul : (F, F) -> F
 mul (a, b) = roundd(tod(a) * tod(b))
 
 div : (F, F) -> F
-div (a, b) = roundd((tod(a) << 16) / tod(b))
+div (a, b) = roundd(todd(a) / tod(b))
 
 mdf : {n} (fin n) => (F, [n]F) -> F
 mdf (a, b) = ys ! 0
@@ -53,7 +57,7 @@ sin x = x - mdf(x, [2..3]) + mdf(x, [2..5]) - mdf(x, [2..7])
 //y(t)=Asin(2pft+o)
 
 channel : T -> R
-channel t = round(sin(tof(t)))
+channel t = round(sin(mul(tof(t), pi_sa)))
 
 sample : T -> [2]R
 sample t = [ channel t , channel (t + 11025) ]
