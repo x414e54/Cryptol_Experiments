@@ -42,10 +42,10 @@ mul (a, b) = roundd(tod(a) * tod(b))
 div : (F, F) -> F
 div (a, b) = roundd(todd(a) / tod(b))
 
-mdf : {n} (fin n) => (F, [n]F) -> F
+mdf : {n} (fin n) => (F, [n]R) -> F
 mdf (a, b) = ys ! 0
-    where ys = [a] # [ mul(div(a, x), y) | x <- b
-                                         | y <- ys
+    where ys = [a] # [ mul(div(a, tof(x)), y) | x <- b
+                                               | y <- ys
                      ]
 
 // Extremely approximate sin
