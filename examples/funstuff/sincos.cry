@@ -3,10 +3,9 @@ type T = [16]
 type F = [32] // Fixed point
 type D = [64] // Double Fixed point - used for mul and div
 
-_T = [0 .. 44099]:[_]T
+_T = [0 .. 22049]:[_]T
 
-// Maybe do (t*PI)/44100 instead
-pi_sa = join [0:R, 4:R] // ~ 0.000071237928653 ~= PI/44100
+pi_sa = join [0:R, 9:R]
 
 ///// Improve these fixed point math functions
 tof : R -> F
@@ -57,11 +56,11 @@ sin x = x - mdf(x, [2..3]) + mdf(x, [2..5]) - mdf(x, [2..7])
 //y(t)=Asin(2pft+o)
 
 channel : T -> R
-channel t = round(sin(mul(tof(t), pi_sa)))
+channel t = round(sin(mul(tof(t % 22050), pi_sa)) * tof(0x7FFF))
 
 sample : T -> [2]R
-sample t = [ channel t , channel (t + 11025) ]
+sample t = [ channel t , channel (t + 5512) ]
 
 // intput to main = array of music notes? for left and right based on selecting via time
-track : R -> [44100][2]R
-track f = [ sample ((f * 44099) + k) | k <- _T ]
+track : R -> [22050][2]R
+track f = [ sample ((f * 22049) + k) | k <- _T ]
