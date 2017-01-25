@@ -1,24 +1,43 @@
 type R = [16]
 type T = [16]
 type F = [32] // Fixed point
+type D = [64] // Double Fixed point - used for mul and div
 
 _T = [0 .. 44099]:[_]T
 
 pi_sa = 0:F             //0.000071237928653
 
+///// Improve these fixed point math functions
 tof : R -> F
 tof a = join [a, 0:R] // * pi_sa // a * pi_sa
 
-fromf : F -> R
-fromf a = (split (a >> 16) : [2]R) ! 0
+round : F -> R
+round a = (split a : [2]R) @ 0 // Round here
+
+trunc : F -> R
+trunc a = (split a : [2]R) @ 0
+
+fract : F -> R
+fract a = (split a : [2]R) @ 1
+
+tod : F -> D
+tod a = join [0:R, trunc(a), fract(a), 0:R]
+
+truncd : D -> F
+truncd a = (split a : [2]F) @ 0
+
+fractd : D -> F
+fractd a = (split a : [2]F) @ 1
+
+roundd : D -> F
+roundd a = join [fract(truncd(a)), trunc(fractd(a))] // Round here
 
 mul : (F, F) -> F
-mul (a, b) = (a * b) >> 16 // Todo rounding
+mul (a, b) = roundd(tod(a) * tod(b))
 
 div : (F, F) -> F
-div (a, b) = (a << 16) / b
+div (a, b) = roundd((tod(a) << 16) / tod(b))
 
-// Improve this
 mdf : {n} (fin n) => (F, [n]F) -> F
 mdf (a, b) = ys ! 0
     where ys = [a] # [ mul(div(a, x), y) | x <- b
@@ -28,11 +47,13 @@ mdf (a, b) = ys ! 0
 // Extremely approximate sin
 sin : F -> F
 sin x = x - mdf(x, [2..3]) + mdf(x, [2..5]) - mdf(x, [2..7])
+///// 
 
+///// Audio code here:
 //y(t)=Asin(2pft+o)
 
 channel : T -> R
-channel t = fromf(sin(tof(t)))
+channel t = round(sin(tof(t)))
 
 sample : T -> [2]R
 sample t = [ channel t , channel (t + 11025) ]
