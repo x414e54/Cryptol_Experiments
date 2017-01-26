@@ -44,7 +44,7 @@ div (a, b) = roundd(todd(a) / tod(b))
 mdf : {n} (fin n) => (F, [n]R) -> F
 mdf (a, b) = ys ! 0
     where ys = [a] # [ mul(div(a, tof(x)), y) | x <- b
-                                               | y <- ys
+                                              | y <- ys
                      ]
 
 // Extremely approximate +ve sin
@@ -82,11 +82,14 @@ fix_amp (w, a, t) = if (t >= 11025) then (w * 0xFFFF) / a else w / a
 sin_wave : R -> T -> R -> R -> R
 sin_wave a t f o = fix_amp(to_sshort(_sin(to_rad(mma(t, f ,o)))), a, mma2(t, f, o))
 
-channel : R-> T -> R
-channel f t = sin_wave 1 t f 0
+channel : [2]R -> T -> R
+channel fo t = sin_wave 1 t (fo @ 0) (fo @ 1)
 
-sample : [2]R -> T -> [4][8]
-sample lr t = join [ split (channel (lr @ 0) t) : [2][8], split (channel (lr @ 1) (t + 5512)) : [2][8] ]
+half_sample : [2][2]R -> T -> [4][8]
+half_sample lr t = join [ split (channel (lr @ 0) t) : [2][8], split (channel (lr @ 1) t) : [2][8] ]
 
-track : [10][2]R -> [10][22050][4][8]
+sample : [2][2][2]R -> T -> [4][8]
+sample lr t = if ((t % 22050) >= 11025) then half_sample (lr @ 0) t else half_sample (lr @ 1) t
+
+track : [10][2][2][2]R -> [10][22050][4][8]
 track lr = [ [ sample lr2 k | k <- _T ] | lr2 <- lr ] 
