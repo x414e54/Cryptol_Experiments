@@ -62,8 +62,8 @@ to_sshort f = round(mul(f, tof(0x7FFF)))
 //y(t) = Asin(2pft+o)
 
 // Used to keep t in 0 <= x < 22050 range, 1 = 2pi/22050
-mma : T -> R -> R ->T 
-mma t f o = t * f + o % 22050
+mma : (T, R, R) -> T 
+mma (t, f, o) = t * f + o % 22050
 
 // a = 1/A
 //square_wave : R -> T -> R -> R -> R
@@ -75,8 +75,8 @@ fix_amp (w, a, t) = if (t >= 11025) then (w * 0xFFFF) / a else w / a
 
 // a = 1/A
 // _sin currently only "works" for 0 <= x < pi so x >= pi needs to be flipped (after rounding)
-sin_wave' : R -> T -> R -> R -> R
-sin_wave' a t = fix_amp(to_sshort(_sin(to_rad(t)), a, t)
+sin_wave' : (R, T) -> R
+sin_wave' (a, t) = fix_amp(to_sshort(_sin(to_rad(t))), a, t)
 
 sin_wave : R -> T -> R -> R -> R
 sin_wave a t f o = sin_wave'(a, mma(t, f, o))
