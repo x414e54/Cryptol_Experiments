@@ -5,7 +5,7 @@ type D = [64] // Double Fixed point - used for mul and div
 
 _T = [0 .. 22049]:[_]T
 
-pi_sa = join [0:R, 12:R]
+pi_sa = join [0:R, 9:R]
 
 ///// Improve these fixed point math functions
 tof : R -> F
@@ -47,20 +47,40 @@ mdf (a, b) = ys ! 0
                                                | y <- ys
                      ]
 
-// Extremely approximate sin
-sin : F -> F
-sin x = x - mdf(x, [2..3]) + mdf(x, [2..5]) - mdf(x, [2..7])
-///// 
+// Extremely approximate +ve sin
+_sin : F -> F
+_sin x = x - mdf(x, [2..3]) + mdf(x, [2..5]) - mdf(x, [2..7])
+
+to_rad : T -> F
+to_rad t = mul(tof(t % 22050), pi_sa)
+
+to_sshort : F -> R
+to_sshort f = round(mul(f, tof(0x7FFF)))
+/////
 
 ///// Audio code here:
-//y(t)=Asin(2pft+o)
+//y(t) = Asin(2pft+o)
+
+// a = 1/A
+//square_wave : R -> T -> R -> R -> R
+//square_wave a t f o = 
+
+// Use square wave here?
+fix_amp : R -> R -> R
+fix_amp w a t = if ((t % 22050) >= 11025) then (w * 0xFFFF) / a else w / a
+
+// a = 1/A
+// _sin currently only "works" for 0 <= x < pi so x >= pi needs to be flipped
+sin_wave : R -> T -> R -> R -> R
+sin_wave a t f o = fix_amp(to_sshort(_sin(to_rad((t * f) + o))), a, (t * f) + o)
 
 channel : T -> R
-channel t = round(mul(sin(mul(tof(t % 22050), pi_sa)), tof(0x7FFF)))
+channel t = sin_wave 1 t 1 0
 
-sample : T -> [4][8]
-sample t = join [ split (channel t) : [2][8], split (channel (t + 5512)) : [2][8] ]
+sample : T -> [2][8]
+//sample t = join [ split (channel t) : [2][8], split (channel (t + 11025)) : [2][8] ]
+sample t = split (channel t) : [2][8]
 
 // intput to main = array of music notes? for left and right based on selecting via time
-track : R -> [22050][4][8]
+track : R -> [22050][2][8]
 track f = [ sample ((f * 22049) + k) | k <- _T ]
