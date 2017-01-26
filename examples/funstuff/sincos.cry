@@ -83,7 +83,7 @@ sin_wave : R -> T -> R -> R -> R
 sin_wave a t f o = fix_amp(to_sshort(_sin(to_rad(mma(t, f ,o)))), a, mma2(t, f, o))
 
 channel : T -> R
-channel t = sin_wave 1 t 1 0
+channel t = sin_wave 1 t 440 0
 
 sample : T -> [4][8]
 sample t = join [ split (channel t) : [2][8], split (channel (t + 11025)) : [2][8] ]
