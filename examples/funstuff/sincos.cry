@@ -82,20 +82,20 @@ fix_amp (w, a, t) = if (t >= 11025) then (w * 0xFFFF) / a else w / a
 sin_wave : R -> T -> R -> R -> R
 sin_wave a t f o = fix_amp(to_sshort(_sin(to_rad(mma(t, f ,o)))), a, mma2(t, f, o))
 
-channel_volume : T -> R
-channel_volume t = (t + 1 % 5513)
+channel_volume : T -> R -> R
+channel_volume t r = if ((t % 5512) > r) then 0x7FFF else 1
 
-channel : [2]R -> T -> R
-channel fo t = sin_wave (channel_volume t) t (fo @ 0) (fo @ 1)
+channel : [3]R -> T -> R
+channel fo t = sin_wave (channel_volume t (fo @ 2)) t (fo @ 0) (fo @ 1)
 
-quarter_sample : ([2][2]R, T) -> [4][8]
+quarter_sample : ([2][3]R, T) -> [4][8]
 quarter_sample (lr, t) = join [ split (channel (lr @ 0) t) : [2][8], split (channel (lr @ 1) t) : [2][8] ]
 
-half_sample : ([2][2][2]R, T) -> [4][8]
-half_sample (lr, t) = if ((t % 11025) >= 5512) then quarter_sample((lr @ 0), t) else quarter_sample((lr @ 1), t)
+half_sample : ([2][2][3]R, T) -> [4][8]
+half_sample (lr, t) = if ((t % 11025) >= 5512) then quarter_sample((lr @ 1), t) else quarter_sample((lr @ 0), t)
 
-sample : [4][2][2]R -> T -> [4][8]
-sample lr t = if ((t % 22050) >= 11025) then half_sample((lr @@ ([0, 1]:[_]R)), t) else half_sample((lr @@ ([1, 2]:[_]R)), t)
+sample : [4][2][3]R -> T -> [4][8]
+sample lr t = if ((t % 22050) >= 11025) then half_sample((lr @@ ([2, 3]:[_]R)), t) else half_sample((lr @@ ([0, 1]:[_]R)), t)
 
-track : [8][4][2][2]R -> [8][22050][4][8]
+track : {n} (fin n) => [n][4][2][3]R -> [n][22050][4][8]
 track lr = [ [ sample lr2 k | k <- _T ] | lr2 <- lr ] 
