@@ -82,12 +82,11 @@ fix_amp (w, a, t) = if (t >= 11025) then (w * 0xFFFF) / a else w / a
 sin_wave : R -> T -> R -> R -> R
 sin_wave a t f o = fix_amp(to_sshort(_sin(to_rad(mma(t, f ,o)))), a, mma2(t, f, o))
 
-channel : T -> R
-channel t = sin_wave 1 t 440 0
+channel : R-> T -> R
+channel f t = sin_wave 1 t f 0
 
-sample : T -> [4][8]
-sample t = join [ split (channel t) : [2][8], split (channel (t + 11025)) : [2][8] ]
+sample : [2]R -> T -> [4][8]
+sample lr t = join [ split (channel (lr @ 0) t) : [2][8], split (channel (lr @ 1) (t + 5512)) : [2][8] ]
 
-// intput to main = array of music notes? for left and right based on selecting via time
-track : R -> [22050][4][8]
-track f = [ sample ((f * 22049) + k) | k <- _T ]
+track : [10][2]R -> [10][22050][4][8]
+track lr = [ [ sample lr2 k | k <- _T ] | lr2 <- lr ] 

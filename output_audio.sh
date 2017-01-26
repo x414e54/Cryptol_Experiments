@@ -1,7 +1,7 @@
 rm -rf audio
 mkdir audio
 cd audio
-echo "track 0" > run_audio.scr
+echo "track [[440, 440], [220, 220], [440, 440], [220, 220], [440, 440], [220, 220], [440, 440], [220, 220], [440, 440], [220, 220]]"  > run_audio.scr
 
 ../.cabal-sandbox/bin/cryptol ../examples/funstuff/sincos.cry -b run_audio.scr > temp
 
@@ -21,9 +21,16 @@ while read -n1 char; do
             fi
             ;;
         t)  case "$char" in
-            [) state="a";
+            [) state="f";
                ;;
             ]) state="e";
+               ;;
+            esac
+            ;;
+        f)  case "$char" in
+            [) state="a";
+               ;;
+            ]) state="t";
                ;;
             esac
             ;;
@@ -31,7 +38,7 @@ while read -n1 char; do
             ,) write_sample
                ;;
             ]) write_sample
-               state="t"
+               state="f"
                ;;
             *) cur_sample+=$char
                ;;
