@@ -61,33 +61,33 @@ to_sshort f = round(mul(f, tof(0x7FFF)))
 ///// Audio code here:
 //y(t) = Asin(2pft+o)
 
-// Used to keep t in 0 <= x < 22050 range, 1 = 2pi/22050
+// Used to keep t in 0 <= x < 22050 range, 1 = pi/22050
 mma : (T, R, R) -> T 
-mma (t, f, o) = t * f + o % 22050
+mma (t, f, o) = (2 * t * f + o) % 22050 
+
+// Mess due to overflowing 16bits
+mma2 : (T, R, R) -> T
+mma2 (t, f, o) = (t * f + o) % 22050  
 
 // a = 1/A
 //square_wave : R -> T -> R -> R -> R
 //square_wave a t f o = 
 
 // Use square wave here?
-fix_amp : (R, R, R) -> R
+fix_amp : (R, R, T) -> R
 fix_amp (w, a, t) = if (t >= 11025) then (w * 0xFFFF) / a else w / a
 
 // a = 1/A
 // _sin currently only "works" for 0 <= x < pi so x >= pi needs to be flipped (after rounding)
-sin_wave' : (R, T) -> R
-sin_wave' (a, t) = fix_amp(to_sshort(_sin(to_rad(t))), a, t)
-
 sin_wave : R -> T -> R -> R -> R
-sin_wave a t f o = sin_wave'(a, mma(t, f, o))
+sin_wave a t f o = fix_amp(to_sshort(_sin(to_rad(mma(t, f ,o)))), a, mma2(t, f, o))
 
 channel : T -> R
 channel t = sin_wave 1 t 1 0
 
-sample : T -> [2][8]
-//sample t = join [ split (channel t) : [2][8], split (channel (t + 11025)) : [2][8] ]
-sample t = split (channel t) : [2][8]
+sample : T -> [4][8]
+sample t = join [ split (channel t) : [2][8], split (channel (t + 11025)) : [2][8] ]
 
 // intput to main = array of music notes? for left and right based on selecting via time
-track : R -> [22050][2][8]
+track : R -> [22050][4][8]
 track f = [ sample ((f * 22049) + k) | k <- _T ]
