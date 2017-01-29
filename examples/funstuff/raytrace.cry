@@ -1,0 +1,21 @@
+type R = [8]
+type C = [8]
+type T = [8]
+
+_T = [0 .. 3]:[_]T
+
+circle : R -> R -> R -> R
+circle x y r = x*x + y*y - r*r 
+
+H : R -> [1]
+H z = if (z == 0 \/ z > 127) then 1 else 0
+
+filter : R -> R -> R -> [1] 
+filter x y r = H (circle x y r)
+
+
+#image : R -> [n][n][1]
+#image r = [ [ filter i j r | i <- X ] | j <- Y ]
+
+raytrace : {w, h} (fin w, fin h) => _ -> [w][h][24]
+raytrace _ = 
