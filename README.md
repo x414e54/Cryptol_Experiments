@@ -1,3 +1,10 @@
+# My Experiements
+These are experiements that will later follow on to an obfuscated or functionally encrypted renderer and audio system:
+
+output_audio.sh - creates an audio file using cryptol and a sine wave
+output_circle.sh - outputs a circle video file
+output_image.sh - outputs a circle image
+
 # Cryptol, version 2
 
     This version of Cryptol is (C) 2013-2016 Galois, Inc., and
@@ -209,7 +216,7 @@ contributing to its design and implementation. Those people include
 (but are not limited to) Iavor Diatchki, Aaron Tomb, Adam Wick, Brian
 Huffman, Dylan McNamee, Joe Kiniry, John Launchbury, Matt Sottile,
 Adam Foltzer, Joe Hendrix, Trevor Elliott, Lee Pike, Mark Tullsen,
-Levent Erkök, David Lazar, Joel Stanley, Jeff Lewis, Andy Gill, Edward
+Levent Erkök, David Lazar, Joel Stanley, Jeff Lewis, Andy Gill, Edward
 Yang, Ledah Casburn, Jim Teisher, Sigbjørn Finne, Mark Shields, Philip
 Weaver, Magnus Carlsson, Fergus Henderson, Joe Hurd, Thomas Nordin,
 John Matthews and Sally Browning. In addition, much of the work on
