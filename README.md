@@ -2,7 +2,9 @@
 These are experiements that will later follow on to an obfuscated or functionally encrypted renderer and audio system:
 
 output_audio.sh - creates an audio file using cryptol and a sine wave
+
 output_circle.sh - outputs a circle video file
+
 output_image.sh - outputs a circle image
 
 # Cryptol, version 2
